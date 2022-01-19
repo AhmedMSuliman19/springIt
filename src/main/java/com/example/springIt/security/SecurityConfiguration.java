@@ -30,14 +30,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .requestMatchers(EndpointRequest.to("info")).permitAll()
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ADMIN")
                 .antMatchers("/actuator/").hasRole("ADMIN")
-                .antMatchers("/").permitAll()
                 .antMatchers("/link/submit").hasRole("USER")
+                .antMatchers("/link/**").permitAll()
+                .antMatchers("/").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
             .and()
                 .formLogin()
+                .loginPage("/login")
+                .permitAll()
+                .usernameParameter("email")
             .and()
-                .csrf().disable()
-                .headers().frameOptions().disable();
+                .logout()
+            .and()
+                .rememberMe();
+
 
     }
 }
