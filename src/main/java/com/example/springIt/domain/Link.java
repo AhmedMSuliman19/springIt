@@ -5,10 +5,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.URL;
 import org.ocpsoft.prettytime.PrettyTime;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,10 +16,10 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
 @RequiredArgsConstructor
 @Getter @Setter
-public class Link extends Auditable{
+@NoArgsConstructor
+public class Link extends Auditable {
 
     @Id @GeneratedValue
     private Long id;
@@ -32,11 +29,10 @@ public class Link extends Auditable{
     private String title;
 
     @NonNull
-    @URL(message = "Please enter a valid URL.")
     @NotEmpty(message = "Please enter a url.")
+    @URL(message = "Please enter a valid url.")
     private String url;
 
-    // comments
     @OneToMany(mappedBy = "link")
     private List<Comment> comments = new ArrayList<>();
 
@@ -45,7 +41,10 @@ public class Link extends Auditable{
 
     private int voteCount = 0;
 
-    public void addComment(Comment comment){
+    @ManyToOne
+    private Users user;
+
+    public void addComment(Comment comment) {
         comments.add(comment);
     }
 

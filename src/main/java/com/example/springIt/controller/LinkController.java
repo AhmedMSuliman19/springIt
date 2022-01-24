@@ -2,8 +2,10 @@ package com.example.springIt.controller;
 
 import com.example.springIt.domain.Comment;
 import com.example.springIt.domain.Link;
+import com.example.springIt.domain.Users;
 import com.example.springIt.service.CommentService;
 import com.example.springIt.service.LinkService;
+import com.example.springIt.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.annotation.Secured;
@@ -25,10 +27,12 @@ public class LinkController {
     private static final Logger logger = LoggerFactory.getLogger(LinkController.class);
     private LinkService linkService;
     private CommentService commentService;
+    private UserService userService;
 
-    public LinkController(LinkService linkService, CommentService commentService) {
+    public LinkController(LinkService linkService, CommentService commentService, UserService userService) {
         this.linkService = linkService;
         this.commentService = commentService;
+        this.userService = userService;
     }
 
     @GetMapping("/")
@@ -60,15 +64,17 @@ public class LinkController {
         return "link/submit";
     }
 
-    @PostMapping("link/submit")
+    @PostMapping("/link/submit")
     public String createLink(@Valid Link link, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
-
         if( bindingResult.hasErrors() ){
             logger.info("Validation errors were found while submitting a new link");
             model.addAttribute("link", link);
             return "link/submit";
         }
         else {
+            linkService.save(link);
+            Optional<Users> user = userService.findByEmail(link.getCreatedBy());
+            link.setUser(user.get());
             linkService.save(link);
             logger.info("New link was saved successfully");
             redirectAttributes
